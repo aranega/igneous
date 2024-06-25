@@ -443,11 +443,13 @@ def locations_for_labels(
 
   SPATIAL_EXT = re.compile(r'\.spatial$')
   index_filenames = cv.mesh.spatial_index.file_locations_per_label(labels)
+  resolution = cv.meta.resolution(cv.mesh.meta.mip)
   for label, locations in index_filenames.items():
     for i, location in enumerate(locations):
-      bbx = Bbox.from_filename(re.sub(SPATIAL_EXT, '', location))
-      bbx /= cv.meta.resolution(cv.mesh.meta.mip)
-      index_filenames[label][i] = bbx.to_filename() + '.frags'
+      bbx = Bbox.from_filename(re.sub(SPATIAL_EXT, '', location), dtype=resolution.dtype)
+      bbx /= resolution
+
+      index_filenames[label][i] = bbx.to_filename(1) + '.frags'
   return index_filenames
 
 def labels_for_shard(

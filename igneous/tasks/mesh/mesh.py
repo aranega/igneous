@@ -131,7 +131,8 @@ class MeshTask(RegisteredTask):
       parallel=self.options['parallel_download'], 
       fill_missing=self.options['fill_missing']
     )
-    self._bounds = Bbox(self.offset, self.shape + self.offset)
+    resolution = self._volume.resolution
+    self._bounds = Bbox(self.offset, self.shape + self.offset, dtype=resolution.dtype)
     self._bounds = Bbox.clamp(self._bounds, self._volume.bounds)
 
     self.progress = bool(self.options['progress'])
@@ -322,7 +323,7 @@ class MeshTask(RegisteredTask):
     mbuf = MapBuffer(meshes, compress="br")
 
     cf.put(
-      f"{self._mesh_dir}/{bbox.to_filename()}.frags",
+      f"{self._mesh_dir}/{bbox.to_filename(1)}.frags",
       content=mbuf.tobytes(),
       compress=None,
       content_type="application/x.mapbuffer",
